@@ -13,6 +13,8 @@ require_once("$srcdir/acl.inc");
 require_once("$srcdir/options.inc.php");
 require_once("$srcdir/../custom/code_types.inc.php");
 require_once("$srcdir/csv_like_join.php");
+require_once("$srcdir/log.inc");
+require_once("$srcdir/pnotes.inc");
 
 if ($ISSUE_TYPES['football_injury']) {
   // Most of the logic for the "football injury" issue type comes from this
@@ -200,13 +202,21 @@ if ($_POST['form_save']) {
 
   // Close this window and redisplay the updated list of issues.
   //
-  echo "<html><body><script language='JavaScript'>\n";
-  if ($info_msg) echo " alert('$info_msg');\n";
-  echo " window.close();\n";
-  echo " if ( opener ) { opener.location.reload(); } else { parent.location.reload(); } \n";
-  echo " if (parent.refreshIssue) parent.refreshIssue($issue,'$tmp_title'); if ( parent.$ ) parent.$.fn.fancybox.close();\n";
-  echo "</script></body></html>\n";
-  exit();
+  reload_close($info_msg, $issue, $tmp_title);
+} else if ($_POST{'form_reconcile'}) {
+  if ($issue) {
+    $query = "UPDATE lists SET " .
+      "reconcilestatus = '" . $_POST['form_reconcilestatus']   . "', "  .
+      "reconcilenote = '" . $_POST['form_reconcilenote']   . "', "  .
+      "reconciledate = NOW() "  .
+      "WHERE id = '$issue'";
+    sqlStatement($query);
+  }
+  newEvent('patient-medication-reconcile-update', $_SESSION['user'], $_SESSION['authProvider'], 1, $query);
+  if ($GLOBALS['reconcile_in_pnotes']) {
+    addPnote($thispid, "{$_SESSION['user']} has reconciled {$_POST['form_title']} with status '{$_POST['form_reconcilestatus']}' and note '{$_POST['form_reconcilenote']}'", 1, 1, 'Pharmacy');
+  }
+  reload_close($info_msg, $issue, $tmp_title);
 }
 
 $irow = array();
@@ -688,6 +698,33 @@ echo generate_select_list('form_medical_type', 'medical_type', $irow['injury_typ
 
 </p>
 </center>
+<?php if (!empty($issue)) { ?>
+  <table border='0' width='100%'>
+  <?php if ($thisauth == 'write') { ?>
+  <tr id='row_reconcilestatus'>
+    <td width='1%' valign='top' nowrap><b><?php xl('Reconcile Status','e'); ?>:</b></td>
+    <td>
+    <?php
+      generate_form_field(array('data_type'=>1,'field_id'=>'reconcilestatus','list_id'=>'reconcilestatus','empty_title'=>'SKIP'), $irow['reconcilestatus']);
+    ?>
+    </td>
+  </tr>
+
+  <tr id='row_reconcilenote'>
+    <td valign='top' nowrap><b><?php xl('Reconcile Note','e'); ?>:</b></td>
+    <td>
+    <textarea name='form_reconcilenote' rows='4' cols='40' wrap='virtual' style='width:100%'><?php echo $irow['reconcilenote'] ?></textarea>
+    </td>
+  </tr>
+  <?php } ?>
+  </table>
+
+  <center>
+  <?php if ($thisauth == 'write') { ?>
+  <input type='submit' name='form_reconcile' value='<?php xl('Reconcile','e'); ?>' />
+  <?php } ?>
+  </center>
+<?php } ?>
 
 </form>
 <script language='JavaScript'>
@@ -698,3 +735,15 @@ echo generate_select_list('form_medical_type', 'medical_type', $irow['injury_typ
 </script>
 </body>
 </html>
+
+<?php
+function reload_close($info_msg, $issue, $tmp_title) {
+  echo "<html><body><script language='JavaScript'>\n";
+  if ($info_msg) echo " alert('$info_msg');\n";
+  echo " window.close();\n";
+  echo " opener.location.reload();\n";
+  echo " if (parent.refreshIssue) parent.refreshIssue($issue,'$tmp_title'); if ( parent.$ ) parent.$.fn.fancybox.close();\n";
+  echo "</script></body></html>\n";
+  exit();
+}
+?>

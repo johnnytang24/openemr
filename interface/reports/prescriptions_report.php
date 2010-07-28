@@ -199,6 +199,8 @@
   <th> <?php xl('Qty','e'); ?> </th>
   <th> <?php xl('Manufacturer','e'); ?> </th>
   <th> <?php xl('Lot','e'); ?> </th>
+  <th> <?php xl('Reconcile Status','e'); ?> </th>
+  <th> <?php xl('Reconcile Note','e'); ?> </th>
  </thead>
  <tbody>
 <?php
@@ -217,12 +219,15 @@
    "i.manufacturer, i.lot_number, i.expiration, " .
    "p.pubpid, ".
    "p.fname, p.lname, p.mname, u.facility_id " .
+   "p.fname, p.lname, p.mname, u.facility_id, " .
+   "l.reconcilestatus, l.reconcilenote " .
    "FROM prescriptions AS r " .
    "LEFT OUTER JOIN drugs AS d ON d.drug_id = r.drug_id " .
    "LEFT OUTER JOIN drug_sales AS s ON s.prescription_id = r.id " .
    "LEFT OUTER JOIN drug_inventory AS i ON i.inventory_id = s.inventory_id " .
    "LEFT OUTER JOIN patient_data AS p ON p.pid = r.patient_id " .
    "LEFT OUTER JOIN users AS u ON u.id = r.provider_id " .
+   "LEFT OUTER JOIN lists AS l ON r.id = l.id " .
    "WHERE $where " .
    //"ORDER BY p.lname, p.fname, r.patient_id, r.id, s.sale_id";
    "ORDER BY p.lname, p.fname, p.pubpid, r.id, s.sale_id";
@@ -313,6 +318,12 @@
   </td>
   <td>
    <?php echo $row['lot_number'] ?>
+  </td>
+  <td>
+   <?php echo $row['reconcilestatus'] ?>
+  </td>
+  <td>
+   <?php echo $row['reconcilenote'] ?>
   </td>
  </tr>
 <?php

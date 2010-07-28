@@ -2255,6 +2255,10 @@ INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES (
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('transactions', 'Legal', 'Legal', 40, 0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('transactions', 'Billing', 'Billing', 50, 0);
 
+INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('reconcilestatus', 'Current', 'Current', 10,  1);
+INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('reconcilestatus', 'Cancelled', 'Cancelled', 20,  0);
+INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('reconcilestatus', 'Discontinued', 'Discontinued', 30,  0);
+
 -- --------------------------------------------------------
 
 -- 
@@ -2282,6 +2286,9 @@ CREATE TABLE `lists` (
   `groupname` varchar(255) default NULL,
   `outcome` int(11) NOT NULL default '0',
   `destination` varchar(255) default NULL,
+  `reconcilestatus` varchar(255) default NULL,
+  `reconcilenote` TEXT default NULL,
+  `reconciledate` DATE default NULL,
   `reinjury_id` bigint(20)  NOT NULL DEFAULT 0,
   `injury_part` varchar(31) NOT NULL DEFAULT '',
   `injury_type` varchar(31) NOT NULL DEFAULT '',

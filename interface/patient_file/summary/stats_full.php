@@ -47,7 +47,7 @@ function refreshIssue(issue, title) {
 
 function dopclick(id) {
     <?php if ($thisauth == 'write'): ?>
-    dlgopen('add_edit_issue.php?issue=' + id, '_blank', 550, 400);
+    dlgopen('add_edit_issue.php?issue=' + id, '_blank', 550, 550);
     <?php else: ?>
     alert("<?php xl('You are not authorized to add/edit issues','e'); ?>");
     <?php endif; ?>
@@ -94,6 +94,8 @@ function newEncounter() {
   <th><?php xl('Referred By','e'); ?></th>
 <?php } ?>
   <th><?php xl('Comments','e'); ?></th>
+  <th><?php xl('Reconcile Status','e'); ?></th>
+  <th><?php xl('Reconcile Date','e'); ?></th>
   <th><?php xl('Enc','e'); ?></th>
  </tr>
 
@@ -160,6 +162,8 @@ while ($row = sqlFetchArray($pres)) {
         echo "  <td>" . $row['referredby'] . "</td>\n";
     }
     echo "  <td>" . $row['comments'] . "</td>\n";
+    echo "  <td class='center'>" . $row['reconcilestatus'] . "</td>\n";
+    echo "  <td class='center'>" . ((empty($row['reconciledate'])) ? "Never" : $row['reconciledate']) . "</td>\n";
     echo "  <td id='e_$rowid' class='noclick center' title='" . xl('View related encounters') . "'>";
     echo "  <input type='button' value='" . $ierow['count'] . "' class='editenc' id='".$rowid."' />";
     echo "  </td>";

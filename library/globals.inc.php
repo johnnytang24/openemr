@@ -433,6 +433,13 @@ $GLOBALS_METADATA = array(
       xl('Discounts at checkout time are entered as money amounts, as opposed to percentage.')
     ),
 
+    'reconcile_in_pnotes' => array(
+      xl('Medication Reconcilement in Notes'),
+      'bool',                           // data type
+      '1',                              // default = true
+      xl('Each patient medication reconcilement is displayed in the patient\'s notes.')
+    ),
+
     'gbl_mask_patient_id' => array(
       xl('Mask for Patient IDs'),
       'text',                           // data type
